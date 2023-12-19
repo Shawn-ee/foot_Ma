@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "146802078407",
+    "project_id": "massageking-d3058",
+    "storage_bucket": "massageking-d3058.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:146802078407:android:b01087b58d67ac20d7c4e2",
+        "android_client_info": {
+          "package_name": "com.example.chatapp_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3P-fmWPaArhkQhpKdbT0J6X7o5g5tlEc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
