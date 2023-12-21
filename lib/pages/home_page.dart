@@ -11,7 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp_firebase/pages/nearby_customer_page.dart';
 import 'package:chatapp_firebase/pages/nearby_masseur_page.dart';
-
+import 'appDrawer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -23,6 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   // ... rest of your code
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   String userName = "";
   String email = "";
   AuthService authService = AuthService();
@@ -84,6 +85,15 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _navigateTo(Widget page) {
+    Navigator.pop(context); // Close the drawer
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,179 +116,8 @@ class _HomePageState extends State<HomePage> {
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 27),
         ),
       ),
-      drawer: Drawer(
-          child: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 50),
-        children: <Widget>[
-          Icon(
-            Icons.account_circle,
-            size: 150,
-            color: Colors.grey[700],
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Text(
-            userName,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(
-            height: 30,
-          ),
-          const Divider(
-            height: 2,
-          ),
+        drawer: const AppDrawer(),
 
-          //groups_page
-          ListTile(
-            onTap: () {
-              setState(() {
-                _currentPage = 'Groups';
-              });
-              Navigator.pop(context); // Close the drawer
-              // Navigate to Groups Page if not already there
-              if (_currentPage != 'Groups') {
-                // Navigation logic for Groups Page
-              }
-            },
-            selected: _currentPage == 'Groups',
-            selectedColor: Theme.of(context).primaryColor,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.group),
-            title: const Text("Groups", style: TextStyle(color: Colors.black)),
-          ),
-
-          //Profile_page
-
-          ListTile(
-            onTap: () {
-              nextScreenReplace(
-                  context,
-                  ProfilePage(
-                    userName: userName,
-                    email: email,
-                  ));
-            },
-            selectedColor: Theme.of(context).primaryColor,
-            selected: true,
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.account_circle),
-            title: const Text(
-              "Profile",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-
-          // forum page
-          ListTile(
-            onTap: () {
-              nextScreenReplace(
-                  context,
-                  ForumPage(
-
-                  ));
-            },
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.forum),
-            title: const Text(
-              "Forum",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
-          if (userRole == 'customer')
-            //nearby masseur
-            ListTile(
-              onTap: () {
-                setState(() {
-                  _currentPage = 'NearbyMasseurs';
-                });
-                Navigator.pop(context); // Close the drawer
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NearbyMasseurPage()),
-                );
-              },
-              selected: _currentPage == 'NearbyMasseurs',
-              selectedColor: Theme.of(context).primaryColor,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              leading: const Icon(Icons.healing),
-              title: const Text("Nearby Masseurs", style: TextStyle(color: Colors.black)),
-            ),
-
-
-          if (userRole == 'masseur')
-          //nearby customer
-            ListTile(
-              onTap: () {
-                setState(() {
-                  _currentPage = 'NearbyCustomers';
-                });
-                Navigator.pop(context); // Close the drawer
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NearbyCustomerPage()),
-                );
-              },
-              selected: _currentPage == 'NearbyCustomers',
-              selectedColor: Theme.of(context).primaryColor,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              leading: const Icon(Icons.location_on),
-              title: const Text("Nearby Customers", style: TextStyle(color: Colors.black)),
-            ),
-
-
-
-
-          //logout button
-          ListTile(
-            onTap: () async {
-              showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: const Text("Logout"),
-                      content: const Text("Are you sure you want to logout?"),
-                      actions: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(
-                            Icons.cancel,
-                            color: Colors.red,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () async {
-                            await authService.signOut();
-                            Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginPage()),
-                                (route) => false);
-                          },
-                          icon: const Icon(
-                            Icons.done,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ],
-                    );
-                  });
-            },
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.exit_to_app),
-            title: const Text(
-              "Logout",
-              style: TextStyle(color: Colors.black),
-            ),
-          )
-        ],
-      )),
       body: groupList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

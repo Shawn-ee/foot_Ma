@@ -2,9 +2,12 @@ import 'package:chatapp_firebase/helper/helper_function.dart';
 import 'package:chatapp_firebase/pages/auth/login_page.dart';
 import 'package:chatapp_firebase/pages/home_page.dart';
 import 'package:chatapp_firebase/service/auth_service.dart';
+import 'package:chatapp_firebase/service/geolocation_service.dart';
 import 'package:chatapp_firebase/widgets/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 
 class RegisterPage extends StatefulWidget {
@@ -23,6 +26,8 @@ class _RegisterPageState extends State<RegisterPage> {
   String password = "";
   String fullName = "";
   String userRole = "";
+  String location = "";
+
   AuthService authService = AuthService();
   @override
   Widget build(BuildContext context) {
@@ -213,6 +218,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  GeolocationService geolocationService = GeolocationService();
   register() async {
     if (formKey.currentState!.validate()) {
       setState(() {
@@ -230,6 +236,24 @@ class _RegisterPageState extends State<RegisterPage> {
           await HelperFunctions.saveUserEmailSF(email);
           await HelperFunctions.saveUserNameSF(fullName);
           await HelperFunctions.saveUserRoleSF(userRole);
+
+
+          // Get and store user location
+
+          final User? user = FirebaseAuth.instance.currentUser;
+          final String uid = user?.uid ?? '';
+          print("uid");
+          print(uid);
+          try {
+            Position position = await geolocationService.getCurrentLocation();
+            print("uid");
+            print(uid);
+            await geolocationService.storeLocation(uid,position);
+            // Location stored successfully
+          } catch (e) {
+            print("location storage error!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            print('Error getting/storing location: $e');
+          }
           nextScreenReplace(context, const HomePage());
         } else {
           showSnackbar(context, Colors.red, value);

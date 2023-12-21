@@ -19,6 +19,7 @@ class DatabaseService {
       "profilePic": "",
       "uid": uid,
       "user_type": user_Role
+
     });
   }
 
