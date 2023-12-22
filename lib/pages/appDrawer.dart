@@ -3,7 +3,7 @@ import 'package:chatapp_firebase/pages/auth/login_page.dart';
 import 'package:chatapp_firebase/pages/profile_page.dart';
 import 'package:chatapp_firebase/pages/search_page.dart';
 import 'package:chatapp_firebase/pages/forum_section/forum_page.dart';
-import 'package:chatapp_firebase/pages/group_page.dart';
+import 'package:chatapp_firebase/pages/group_section/group_page.dart';
 import 'package:chatapp_firebase/service/auth_service.dart';
 import 'package:chatapp_firebase/service/database_service.dart';
 import 'package:chatapp_firebase/widgets/group_tile.dart';
@@ -63,6 +63,7 @@ class _AppDrawerState extends State<AppDrawer> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
           // Extract user data
+          String user_id = snapshot.data!['uid'] ?? '';
           String userName = snapshot.data!['userName'] ?? '';
           String email = snapshot.data!['email'] ?? '';
           String userRole = snapshot.data!['userRole'] ?? '';
@@ -126,8 +127,7 @@ class _AppDrawerState extends State<AppDrawer> {
                       nextScreenReplace(
                           context,
                           ProfilePage(
-                            userName: userName,
-                            email: email,
+                            userId: user_id
                           ));
                     },
                     selectedColor: Theme.of(context).primaryColor,

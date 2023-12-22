@@ -1,4 +1,4 @@
-import 'package:chatapp_firebase/pages/group_info.dart';
+import 'package:chatapp_firebase/pages/group_section/group_info.dart';
 import 'package:chatapp_firebase/service/database_service.dart';
 import 'package:chatapp_firebase/widgets/message_tile.dart';
 import 'package:chatapp_firebase/widgets/widgets.dart';
