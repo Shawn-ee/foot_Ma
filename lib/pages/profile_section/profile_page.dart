@@ -1,9 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../service/auth_service.dart';
-import 'appDrawer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../service/auth_service.dart';
+import '../appDrawer.dart';
 import 'edit_profile_page.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:chatapp_firebase/service/storage_function/storage.dart';
+
+import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
   final String userId;
@@ -17,16 +22,22 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FileStorageService _fileStorageService = FileStorageService();
+
+
 
   bool isLoading = true;
   String userName = '';
   String userDescription = '';
   String email = '';
   String gender = '';
+  String? avatarUrl;
 
   @override
   void initState() {
     super.initState();
+
+    _fileStorageService.loadAvatar(widget.userId);
     _loadUserProfile();
   }
 
@@ -83,7 +94,13 @@ class _ProfilePageState extends State<ProfilePage> {
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 170),
           child: Column(
             children: <Widget>[
-              Icon(
+              avatarUrl != null && avatarUrl!.isNotEmpty
+                  ? CircleAvatar(
+                radius: 100, // Adjust the size to fit your design
+                backgroundImage: NetworkImage(avatarUrl!),
+                backgroundColor: Colors.transparent,
+              )
+                  : Icon(
                 Icons.account_circle,
                 size: 200,
                 color: Colors.grey[700],

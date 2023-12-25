@@ -1,6 +1,6 @@
 import 'package:chatapp_firebase/helper/helper_function.dart';
 import 'package:chatapp_firebase/pages/auth/login_page.dart';
-import 'package:chatapp_firebase/pages/profile_page.dart';
+import 'package:chatapp_firebase/pages/profile_section/profile_page.dart';
 import 'package:chatapp_firebase/pages/search_page.dart';
 import 'package:chatapp_firebase/pages/appDrawer.dart';
 import 'package:chatapp_firebase/pages/forum_section/forum_page.dart';

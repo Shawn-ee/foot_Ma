@@ -237,11 +237,11 @@ class _RegisterPageState extends State<RegisterPage> {
           await HelperFunctions.saveUserNameSF(fullName);
           await HelperFunctions.saveUserRoleSF(userRole);
 
-
           // Get and store user location
 
           final User? user = FirebaseAuth.instance.currentUser;
           final String uid = user?.uid ?? '';
+          await HelperFunctions.saveUserIdSF(uid);
           print("uid");
           print(uid);
           try {

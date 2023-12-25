@@ -1,6 +1,6 @@
 import 'package:chatapp_firebase/helper/helper_function.dart';
 import 'package:chatapp_firebase/pages/auth/login_page.dart';
-import 'package:chatapp_firebase/pages/profile_page.dart';
+import 'package:chatapp_firebase/pages/profile_section/profile_page.dart';
 import 'package:chatapp_firebase/pages/search_page.dart';
 import 'package:chatapp_firebase/pages/forum_section/forum_page.dart';
 import 'package:chatapp_firebase/pages/group_section/group_page.dart';
@@ -48,8 +48,9 @@ class _AppDrawerState extends State<AppDrawer> {
     String roleValue = await HelperFunctions.getUserRoleFromSF() ?? '';
     String userEmail = await HelperFunctions.getUserEmailFromSF() ?? '';
     String userNameValue = await HelperFunctions.getUserNameFromSF() ?? '';
-
+    String userIDValue = await HelperFunctions.getUserIdFromSF() ?? '';
     return {
+      'uid': userIDValue,
       'userRole': roleValue,
       'email': userEmail,
       'userName': userNameValue,
@@ -67,6 +68,10 @@ class _AppDrawerState extends State<AppDrawer> {
           String userName = snapshot.data!['userName'] ?? '';
           String email = snapshot.data!['email'] ?? '';
           String userRole = snapshot.data!['userRole'] ?? '';
+          print(user_id);
+          print(userName);
+          print(email);
+          print(userRole);
 
           // Build the drawer with user data
           return Drawer(
@@ -100,19 +105,7 @@ class _AppDrawerState extends State<AppDrawer> {
                           context,
                           GroupPage());
                     },
-                    // onTap: () {
-                    //   setState(() {
-                    //     _currentPage = 'Groups';
-                    //   });
-                    //   Navigator.pop(context); // Close the drawer
-                    //   // Navigate to Groups Page if not already there
-                    //   if (_currentPage != 'Groups') {
-                    //     nextScreenReplace(
-                    //         context,
-                    //         GroupPage
-                    //     );
-                    //   }
-                    // },
+
                     selected: _currentPage == 'Groups',
                     selectedColor: Theme.of(context).primaryColor,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
