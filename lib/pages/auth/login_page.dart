@@ -31,9 +31,11 @@ class _LoginPageState extends State<LoginPage> {
                   color: Theme.of(context).primaryColor),
             )
           : SingleChildScrollView(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 80),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.1, // 10% of screen width
+                vertical: MediaQuery.of(context).size.height * 0.1, // 10% of screen height
+                ),
                 child: Form(
                     key: formKey,
                     child: Column(
@@ -41,15 +43,11 @@ class _LoginPageState extends State<LoginPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         const Text(
-                          "Groupie",
+                          "AAAAAA",
                           style: TextStyle(
                               fontSize: 40, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 10),
-                        const Text("Login now to see what they are talking!",
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w400)),
-                        Image.asset("assets/login.png"),
+                        // Image.asset("assets/login.png"),
                         TextFormField(
                           decoration: textInputDecoration.copyWith(
                               labelText: "Email",
