@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,9 @@ import '../appDrawer.dart';
 import 'edit_profile_page.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chatapp_firebase/service/storage_function/storage.dart';
-
+import 'package:chatapp_firebase/service/UserProfileService.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
@@ -23,6 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FileStorageService _fileStorageService = FileStorageService();
+  UserProfileService? userProfileService;
 
 
 
@@ -33,34 +38,67 @@ class _ProfilePageState extends State<ProfilePage> {
   String gender = '';
   String? avatarUrl;
 
+
   @override
   void initState() {
     super.initState();
-
-    _fileStorageService.loadAvatar(widget.userId);
-    _loadUserProfile();
+    userProfileService = UserProfileService(FirebaseAuth.instance, FirebaseFirestore.instance);
+    loadUserProfile();
+    _loadAvatar();
   }
 
-  _loadUserProfile() async {
-    String uid = _auth.currentUser?.uid ?? '';
-    try {
-      var userData = await _firestore.collection('users').doc(uid).get();
-      if (userData.exists) {
-        setState(() {
-          userName = userData.data()?['fullName'] ?? '';
-          userDescription = userData.data()?['description'] ?? '';
-          email = userData.data()?['email'] ?? '';
-          isLoading = false;
-          gender = userData.data()?['gender'] ?? 'male';
-        });
-      } else {
-        // Handle the case where the user data does not exist
-        print("User data not found");
-      }
-    } catch (e) {
+  Future<File> downloadAndSaveImage(String url, String filename) async {
 
-      // Handle any errors here
-      print('Error fetching user data: $e');
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/$filename';
+    final response = await http.get(Uri.parse(url));
+    final file = File(filePath);
+    return file.writeAsBytes(response.bodyBytes);
+  }
+
+  Future<File?> getLocalAvatarFile(String filename) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/$filename';
+    final file = File(filePath);
+
+    return file.existsSync() ? file : null;
+  }
+
+  Future<void> _loadAvatar() async {
+
+    String filename = 'avatar.png'; // You can use a dynamic name based on user ID or something unique
+
+    // Check if avatar is stored locally
+    File? localFile = await getLocalAvatarFile(filename);
+
+    if (localFile != null) {
+      // Load from local file
+      setState(() {
+        avatarUrl = localFile.path;
+      });
+    } else {
+      String? firebaseImageUrl = await _fileStorageService.loadAvatar(widget.userId);
+      if (firebaseImageUrl == null) {
+        print('No avatar URL available');
+        return;
+      }
+      // Download from Firebase and save locally
+      File downloadedFile = await downloadAndSaveImage(firebaseImageUrl, filename);
+      setState(() {
+        avatarUrl = downloadedFile.path;
+      });
+    }
+  }
+  Future<void> loadUserProfile() async {
+    var data = await userProfileService?.loadUserProfile();
+    if (data != null) {
+      setState(() {
+        userName = data['fullName'] ?? '';
+        userDescription = data['description'] ?? '';
+        email = data['email'] ?? '';
+        gender = data['gender'] ?? 'male';
+        isLoading = false;
+      });
     }
   }
 
@@ -95,16 +133,16 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             children: <Widget>[
               avatarUrl != null && avatarUrl!.isNotEmpty
-                  ? CircleAvatar(
-                radius: 100, // Adjust the size to fit your design
-                backgroundImage: NetworkImage(avatarUrl!),
+            ? CircleAvatar(
+                radius: 100, // Adjust the radius as needed
+                backgroundImage: FileImage(File(avatarUrl!)),
                 backgroundColor: Colors.transparent,
               )
                   : Icon(
-                Icons.account_circle,
-                size: 200,
-                color: Colors.grey[700],
-              ),
+                      Icons.account_circle,
+                      size: 200, // Adjust the size as needed
+                      color: Colors.grey[700], // You can adjust the color as needed
+                    ),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -1,4 +1,4 @@
-import 'package:chatapp_firebase/pages/ImageUploadPage.dart';
+import 'package:chatapp_firebase/pages/profile_section/ImageUploadPage.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chatapp_firebase/pages/home_page.dart';
 import 'dart:io';
+import 'package:chatapp_firebase/service/UserProfileService.dart';
 
 import '../../helper/helper_function.dart';
 
@@ -23,6 +24,7 @@ class EditProfilePageState extends State<EditProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final ImagePicker _picker = ImagePicker();
+  UserProfileService? userProfileService;
   TextEditingController? _nameController;
   TextEditingController? _descriptionController;
 
@@ -40,35 +42,23 @@ class EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
+    userProfileService = UserProfileService(FirebaseAuth.instance, FirebaseFirestore.instance);
+    loadUserProfile();
   }
 
-  _loadUserProfile() async {
-    String uid = _auth.currentUser?.uid ?? '';
-    print(uid);
-    try {
-      var userData = await _firestore.collection('users').doc(uid).get();
-      if (userData.exists) {
-        setState(() {
-          userName = userData.data()?['fullName'] ?? '';
-          userDescription = userData.data()?['description'] ?? '';
-          email = userData.data()?['email'] ?? '';
-          isLoading = false;
-          gender = userData.data()?['gender'] ?? 'male';
-          uid = userData.data()?['uid'];
-
-        });
-        _nameController = TextEditingController(text: userName);
-        _descriptionController = TextEditingController(text: userDescription);
-      } else {
-        // Handle the case where the user data does not exist
-        print("User data not found");
-      }
-    } catch (e) {
-
-      // Handle any errors here
-      print('Error fetching user data: $e');
+  Future<void> loadUserProfile() async {
+    var data = await userProfileService?.loadUserProfile();
+    if (data != null) {
+      setState(() {
+        userName = data['fullName'] ?? '';
+        userDescription = data['description'] ?? '';
+        email = data['email'] ?? '';
+        gender = data['gender'] ?? 'male';
+        isLoading = false;
+      });
     }
+    _nameController = TextEditingController(text: userName);
+    _descriptionController = TextEditingController(text: userDescription);
   }
 
   Future<void> _pickImages() async {

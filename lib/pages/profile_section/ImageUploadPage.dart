@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 
-import '../service/storage_function/storage.dart';
+import '../../service/storage_function/storage.dart';
 
 class ImageUploadPage extends StatefulWidget {
   @override
