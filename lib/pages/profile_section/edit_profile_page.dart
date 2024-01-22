@@ -6,9 +6,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chatapp_firebase/pages/home_page.dart';
 import 'dart:io';
-import 'package:chatapp_firebase/service/UserProfileService.dart';
 
-import '../../helper/helper_function.dart';
+import '../../service/storage_function/sharepreferenceinfo.dart';
+import '../../service/storage_function/storage.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String uid;
@@ -24,7 +24,6 @@ class EditProfilePageState extends State<EditProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final ImagePicker _picker = ImagePicker();
-  UserProfileService? userProfileService;
   TextEditingController? _nameController;
   TextEditingController? _descriptionController;
 
@@ -38,16 +37,17 @@ class EditProfilePageState extends State<EditProfilePage> {
 
   List<File> _selectedImages = [];
   List<String> _uploadedImageUrls = [];
+  late FileStorageService _fileStorageService;
+
 
   @override
   void initState() {
     super.initState();
-    userProfileService = UserProfileService(FirebaseAuth.instance, FirebaseFirestore.instance);
     loadUserProfile();
   }
 
   Future<void> loadUserProfile() async {
-    var data = await userProfileService?.loadUserProfile();
+    var data = await _fileStorageService?.loadUserProfile();
     if (data != null) {
       setState(() {
         userName = data['fullName'] ?? '';
@@ -70,71 +70,9 @@ class EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  Future<void> _uploadImages() async {
-    for (var image in _selectedImages) {
-      String fileName = 'user_images/${widget.uid}/${DateTime.now().millisecondsSinceEpoch}.jpg';
-      TaskSnapshot snapshot = await FirebaseStorage.instance.ref(fileName).putFile(image);
-      String downloadUrl = await snapshot.ref.getDownloadURL();
-      _uploadedImageUrls.add(downloadUrl);
-    }
 
-    // Update Firestore with the image URLs
-    await _firestore.collection('users').doc(widget.uid).update({
-      'imageUrls': _uploadedImageUrls,
-    });
 
-    // Clear the selected images
-    setState(() {
-      _selectedImages = [];
-    });
 
-    // Show a success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Images uploaded successfully!'),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
-  Future<void> _updateProfile() async {
-    String uid = _auth.currentUser?.uid ?? '';
-    print(uid);
-    print(userName);
-    print(userDescription);
-
-    try {
-      // Update Firebase
-      await _firestore.collection('users').doc(uid).update({
-        'fullName': userName,
-        'description': userDescription,
-        // Update imageUrl if necessary
-      });
-
-      _uploadImages();
-      // Update SharedPreferences
-      await HelperFunctions.saveUserNameSF(userName);
-      // Assuming you have a method to save the description in SharedPreferences
-      await HelperFunctions.saveUserDescriptionSF(userDescription);
-
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Profile updated successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-    } catch (e) {
-      // Handle errors, for example, show an error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to update profile: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
 
 
   @override
@@ -203,7 +141,11 @@ class EditProfilePageState extends State<EditProfilePage> {
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _updateProfile,
+                onPressed: () async {
+                  // Call the updateProfile method inside an async function
+                  await _fileStorageService.updateProfile(userName, userDescription);
+                  // You can add additional code here to handle after the profile is updated
+                },
                 child: Text('Update Profile'),
               ),
             ],

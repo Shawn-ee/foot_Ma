@@ -17,6 +17,7 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
   final ImagePicker _picker = ImagePicker();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FileStorageService _fileStorageService = FileStorageService();
   List<File> _selectedImages = [];
   List<String> _uploadedImageUrls = [];
   String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
@@ -32,14 +33,14 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
     }
   }
 
-  Future<void> _uploadImages() async {
-    FileStorageService fileStorageService = FileStorageService();
+  Future<void> _uploadAvatar() async {
+
 
     for (var image in _selectedImages) {
       String fileName = 'user/$uid/profile_pictures/$uid.jpg';
 
       // Use the file storage service to upload the image
-      String downloadUrl = await fileStorageService.uploadImage(image, fileName);
+      String downloadUrl = await _fileStorageService.uploadImage(image, fileName);
       if (downloadUrl.isNotEmpty) {
         _uploadedImageUrls.add(downloadUrl);
       }
@@ -73,7 +74,7 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.cloud_upload),
-            onPressed: _uploadImages,
+            onPressed: _uploadAvatar,
           ),
         ],
       ),

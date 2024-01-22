@@ -1,6 +1,7 @@
-import 'package:chatapp_firebase/helper/helper_function.dart';
+import 'package:chatapp_firebase/service/storage_function/sharepreferenceinfo.dart';
 import 'package:chatapp_firebase/pages/auth/login_page.dart';
-import 'package:chatapp_firebase/pages/home_page.dart';
+// import 'package:chatapp_firebase/pages/home_page.dart';
+import 'package:chatapp_firebase/pages/homepage.dart';
 import 'package:chatapp_firebase/service/auth_service.dart';
 import 'package:chatapp_firebase/service/geolocation_service.dart';
 import 'package:chatapp_firebase/widgets/widgets.dart';
@@ -47,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         const Text(
-                          "ASAP",
+                          "HOMIE",
                           style: TextStyle(
                               fontSize: 40, fontWeight: FontWeight.bold),
                         ),

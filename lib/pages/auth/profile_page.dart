@@ -4,12 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../service/auth_service.dart';
 import '../appDrawer.dart';
-import 'edit_profile_page.dart';
+import '../profile_section/edit_profile_page.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chatapp_firebase/service/storage_function/storage.dart';
-import 'package:chatapp_firebase/service/UserProfileService.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -27,9 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FileStorageService _fileStorageService = FileStorageService();
-  UserProfileService? userProfileService;
-
-
+  // UserProfileService? userProfileService;
 
   bool isLoading = true;
   String userName = '';
@@ -38,66 +34,62 @@ class _ProfilePageState extends State<ProfilePage> {
   String gender = '';
   String? avatarUrl;
 
-
   @override
   void initState() {
     super.initState();
-    userProfileService = UserProfileService(FirebaseAuth.instance, FirebaseFirestore.instance);
     loadUserProfile();
     _loadAvatar();
   }
 
-  Future<File> downloadAndSaveImage(String url, String filename) async {
-
-    final directory = await getApplicationDocumentsDirectory();
-    final filePath = '${directory.path}/$filename';
-    final response = await http.get(Uri.parse(url));
-    final file = File(filePath);
-    return file.writeAsBytes(response.bodyBytes);
-  }
-
-  Future<File?> getLocalAvatarFile(String filename) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final filePath = '${directory.path}/$filename';
-    final file = File(filePath);
-
-    return file.existsSync() ? file : null;
-  }
-
   Future<void> _loadAvatar() async {
 
-    String filename = 'avatar.png'; // You can use a dynamic name based on user ID or something unique
-
-    // Check if avatar is stored locally
-    File? localFile = await getLocalAvatarFile(filename);
-
-    if (localFile != null) {
-      // Load from local file
-      setState(() {
-        avatarUrl = localFile.path;
-      });
-    } else {
-      String? firebaseImageUrl = await _fileStorageService.loadAvatar(widget.userId);
-      if (firebaseImageUrl == null) {
-        print('No avatar URL available');
-        return;
+    String filename =  '${widget.userId}.png';
+    String localpath = await _fileStorageService.getlocalAvatarpath(widget.userId);
+    try{
+      if (localpath != "") {
+        // Load from local file
+        setState(() {
+          avatarUrl = localpath;
+        });
       }
-      // Download from Firebase and save locally
-      File downloadedFile = await downloadAndSaveImage(firebaseImageUrl, filename);
-      setState(() {
-        avatarUrl = downloadedFile.path;
-      });
+      else {
+        String? firebaseImageUrl = await _fileStorageService.loadAvatarurl(widget.userId);
+        if (firebaseImageUrl == null) {
+          print('No avatar URL available');
+          return;
+        }
+        // Download from Firebase and save locally
+        File downloadedFile = await _fileStorageService.downloadAndSaveImage(firebaseImageUrl, filename);
+        setState(() {
+          avatarUrl = downloadedFile.path;
+        });
+      }
+
     }
+    catch(e){
+      print("User data not found");
+      return null;
+    }
+
   }
   Future<void> loadUserProfile() async {
-    var data = await userProfileService?.loadUserProfile();
+    var data = await _fileStorageService?.loadUserProfile();
     if (data != null) {
       setState(() {
+        print('Setting userName: ${data['fullName']}');
         userName = data['fullName'] ?? '';
+
+        print('Setting userDescription: ${data['description']}');
         userDescription = data['description'] ?? '';
+
+        print('Setting email: ${data['email']}');
         email = data['email'] ?? '';
+
+        print('Setting gender: ${data['gender']}');
         gender = data['gender'] ?? 'male';
+
         isLoading = false;
+        print('Setting isLoading: false');
       });
     }
   }

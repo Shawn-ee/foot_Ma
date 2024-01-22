@@ -47,12 +47,12 @@ class _NearbyMasseurPageState extends State<NearbyMasseurPage> {
             itemCount: users.length,
             itemBuilder: (context, index) {
               var user = users[index].data() as Map<String, dynamic>;
-              return user_card(
-                name: user['fullName'] ?? 'No Name',
-                image: user['image'] ?? 'assets/default.png',
-                // Replace with a default image path
-                description: user['description'] ?? 'No Description',
-              );
+              // return user_card(
+              //   name: user['fullName'] ?? 'No Name',
+              //   image: user['image'] ?? 'assets/default.png',
+              //   // Replace with a default image path
+              //   description: user['description'] ?? 'No Description',
+              // );
             },
           );
         },

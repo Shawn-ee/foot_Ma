@@ -1,6 +1,7 @@
-import 'package:chatapp_firebase/helper/helper_function.dart';
+import 'package:chatapp_firebase/service/storage_function/sharepreferenceinfo.dart';
+import 'package:chatapp_firebase/service/storage_function/storage.dart';
 import 'package:chatapp_firebase/pages/auth/login_page.dart';
-import 'package:chatapp_firebase/pages/profile_section/profile_page.dart';
+import 'package:chatapp_firebase/pages/auth/profile_page.dart';
 import 'package:chatapp_firebase/pages/search_page.dart';
 import 'package:chatapp_firebase/pages/forum_section/forum_page.dart';
 import 'package:chatapp_firebase/pages/group_section/group_page.dart';
@@ -23,6 +24,7 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
+  FileStorageService fileStorageService = FileStorageService();
   String userName = "";
   String email = "";
   AuthService authService = AuthService();
@@ -35,32 +37,12 @@ class _AppDrawerState extends State<AppDrawer> {
   @override
 
   // string manipulation
-  String getId(String res) {
-    return res.substring(0, res.indexOf("_"));
-  }
 
-  String getName(String res) {
-    return res.substring(res.indexOf("_") + 1);
-  }
-
-  Future<Map<String, String>> getUserData() async {
-    // Fetch user data
-    String roleValue = await HelperFunctions.getUserRoleFromSF() ?? '';
-    String userEmail = await HelperFunctions.getUserEmailFromSF() ?? '';
-    String userNameValue = await HelperFunctions.getUserNameFromSF() ?? '';
-    String userIDValue = await HelperFunctions.getUserIdFromSF() ?? '';
-    return {
-      'uid': userIDValue,
-      'userRole': roleValue,
-      'email': userEmail,
-      'userName': userNameValue,
-    };
-  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, String>>(
-      future: getUserData(),
+      future: fileStorageService.getUserDataFromCache(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
           // Extract user data
@@ -68,10 +50,10 @@ class _AppDrawerState extends State<AppDrawer> {
           String userName = snapshot.data!['userName'] ?? '';
           String email = snapshot.data!['email'] ?? '';
           String userRole = snapshot.data!['userRole'] ?? '';
-          print(user_id);
-          print(userName);
-          print(email);
-          print(userRole);
+          // print(user_id);
+          // print(userName);
+          // print(email);
+          // print(userRole);
 
           // Build the drawer with user data
           return Drawer(

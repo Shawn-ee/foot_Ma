@@ -1,6 +1,7 @@
-import 'package:chatapp_firebase/helper/helper_function.dart';
+import 'package:chatapp_firebase/service/storage_function/sharepreferenceinfo.dart';
 import 'package:chatapp_firebase/pages/auth/register_page.dart';
-import 'package:chatapp_firebase/pages/home_page.dart';
+// import 'package:chatapp_firebase/pages/home_page.dart';
+import 'package:chatapp_firebase/pages/homepage.dart';
 import 'package:chatapp_firebase/service/auth_service.dart';
 import 'package:chatapp_firebase/service/database_service.dart';
 import 'package:chatapp_firebase/widgets/widgets.dart';
@@ -43,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         const Text(
-                          "AAAAAA",
+                          "HOMIES",
                           style: TextStyle(
                               fontSize: 40, fontWeight: FontWeight.bold),
                         ),
