@@ -21,7 +21,7 @@ class _NearbyMasseurPageState extends State<NearbyMasseurPage> {
       ),
       drawer: const AppDrawer(),
       body: StreamBuilder<QuerySnapshot>(
-        stream: firestore.collection('users').where('user_type', isEqualTo: 'masseur').snapshots(),
+        stream: firestore.collection('masseurs').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
